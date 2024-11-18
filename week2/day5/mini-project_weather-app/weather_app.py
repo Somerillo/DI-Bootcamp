@@ -119,7 +119,7 @@ class Get_Weather:
             return None
 
 
-api_key = 'e9a9304081c135f075a0b0f220e29980'
+api_key = 'my-api'
 
 # Create instances for each city
 # cities = ["Ashkelon,IL", "Tel Aviv,IL", "Los Angeles,US"]

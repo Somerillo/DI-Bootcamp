@@ -51,7 +51,7 @@ def imprimir_pronostico(pronostico):
             print("-" * 40)
 
 # Ejemplo de uso
-api_key = 'HJ8Bm1TnksCEd3A8ujLWjTlhVDx01jFK'  # Reemplaza con tu clave de API
+api_key = 'my-api'  # Reemplaza con tu clave de API
 latitud = 40.7128  # Latitud de Nueva York
 longitud = -74.0060  # Longitud de Nueva York
 
