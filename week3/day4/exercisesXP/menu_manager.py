@@ -5,7 +5,7 @@ from menu_item import MenuItem
 DB_CONFIG = {
     "database": "RestaurantMenuManager",
     "user": "postgres",
-    "password": "mangosta",
+    "password": "postgres_password",
     "host": "localhost",
     "port": "5432"
 }
