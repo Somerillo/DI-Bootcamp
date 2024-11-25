@@ -1,0 +1,10 @@
+    One of the most famous case studies is referred to Target stores in the USA. They used (and still use) targeted advertising as a client strategy, i.e., by analyzing purchasing patterns and behaviors, they can (try) to predict the products their clients are more prone to buy. A particular case refers to a teenager who, after analyzing her purchase patterns, was associated by the recommendation system with the group of pregnancy purchases, and the corresponding advertisements arrived at her home and were received by her father. Long story short, that's how her father found out he was going to be a grandpa: through Target's advertisements.
+
+     No compensation was addressed to the damaged party, and still, now Target continues deploying targeted advertising. It's worth noting that Target's targeted advertising strategy has been modified due to that particular case: the targeted advertising is mixed randomly with other general advertisements. That way, only the focused group can notice their items of interest among other general items, while the non-targeted public will see only general advertisements without a particular pattern.
+
+    Without data analysis, the teenager's father wouldn't have learned the hard way he was going to be a grandfather. Also, this way, Target would have missed some potential buyers. The final strategy of mixing targeted advertising with random advertising is a win-win situation.
+
+
+https://www.forbes.com/sites/kashmirhill/2012/02/16/how-target-figured-out-a-teen-girl-was-pregnant-before-her-father-did/
+https://www.kdnuggets.com/2014/05/target-predict-teen-pregnancy-inside-story.html
+https://medium.com/@colin.fraser/target-didnt-figure-out-a-teen-girl-was-pregnant-before-her-father-did-a6be13b973a5
