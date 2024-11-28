@@ -1,0 +1,108 @@
+When cleaning date and time data, it's essential to recognize common datetime formats and understand how to correct them to a standard format in a pandas DataFrame. Below are various datetime structures you might encounter and how to convert them into a consistent pandas datetime format:
+1. Standard ISO 8601 Format
+Format Example: 2023-11-26 or 2023-11-26T15:23:01
+How to Fix: Use pd.to_datetime(). Pandas handles ISO 8601 natively.
+import pandas as pd
+
+# Example
+data = {'date': ['2023-11-26', '2023-11-26T15:23:01']}
+df = pd.DataFrame(data)
+df['date'] = pd.to_datetime(df['date'])
+print(df)
+2. US Format (MM/DD/YYYY)
+Format Example: 11/26/2023, 11/26/23
+How to Fix: Explicitly specify the format using format='%m/%d/%Y'.
+# Example
+data = {'date': ['11/26/2023', '11/26/23']}
+df = pd.DataFrame(data)
+df['date'] = pd.to_datetime(df['date'], format='%m/%d/%Y', errors='coerce')
+print(df)
+3. European Format (DD/MM/YYYY)
+Format Example: 26/11/2023, 26-11-2023
+How to Fix: Specify the format as '%d/%m/%Y'.
+# Example
+data = {'date': ['26/11/2023', '26-11-2023']}
+df = pd.DataFrame(data)
+df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y', errors='coerce')
+print(df)
+4. Textual Dates
+Format Example: 26th Nov 2023, November 26, 2023
+How to Fix: Pandas can parse textual dates without additional parameters.
+# Example
+data = {'date': ['26th Nov 2023', 'November 26, 2023']}
+df = pd.DataFrame(data)
+df['date'] = pd.to_datetime(df['date'])
+print(df)
+5. Datetime with Timezone
+Format Example: 2023-11-26T15:23:01+00:00, 2023-11-26 15:23:01 UTC
+How to Fix: Pandas can handle timezone-aware datetimes natively.
+# Example
+data = {'date': ['2023-11-26T15:23:01+00:00', '2023-11-26 15:23:01 UTC']}
+df = pd.DataFrame(data)
+df['date'] = pd.to_datetime(df['date'])
+print(df)
+6. Unix Timestamps
+Format Example: 1698370800 (seconds), 1698370800000 (milliseconds)
+How to Fix: Use unit='s' or unit='ms' depending on the timestamp format.
+# Example
+data = {'date': [1698370800, 1698370800000]}
+df = pd.DataFrame(data)
+
+# Convert seconds
+df['date_seconds'] = pd.to_datetime(df['date'], unit='s')
+
+# Convert milliseconds
+df['date_milliseconds'] = pd.to_datetime(df['date'], unit='ms')
+
+print(df)
+7. Custom Formats
+Format Example: 20231126, 2023.11.26
+How to Fix: Specify the format explicitly.
+# Example
+data = {'date': ['20231126', '2023.11.26']}
+df = pd.DataFrame(data)
+df['date'] = pd.to_datetime(df['date'], format='%Y%m%d', errors='coerce')
+print(df)
+8. Ambiguous Formats
+Format Example: 03/04/2023 (Could be MM/DD/YYYY or DD/MM/YYYY)
+How to Fix: Explicitly define the format to avoid confusion.
+# Example
+data = {'date': ['03/04/2023']}
+df = pd.DataFrame(data)
+
+# Assuming MM/DD/YYYY
+df['date_us'] = pd.to_datetime(df['date'], format='%m/%d/%Y', errors='coerce')
+
+# Assuming DD/MM/YYYY
+df['date_eu'] = pd.to_datetime(df['date'], format='%d/%m/%Y', errors='coerce')
+
+print(df)
+9. Incomplete Dates
+Format Example: 2023-11, 2023
+How to Fix: Use format='%Y-%m' or format='%Y'.
+# Example
+data = {'date': ['2023-11', '2023']}
+df = pd.DataFrame(data)
+df['date'] = pd.to_datetime(df['date'], format='%Y-%m', errors='coerce')
+print(df)
+10. Irregular Formats
+Format Example: 2023/11/26 15:23:01, 26.Nov.2023 15:23
+How to Fix: Define the format string explicitly.
+# Example
+data = {'date': ['2023/11/26 15:23:01', '26.Nov.2023 15:23']}
+df = pd.DataFrame(data)
+df['date'] = pd.to_datetime(df['date'], format='%Y/%m/%d %H:%M:%S', errors='coerce')
+print(df)
+11. Missing or Null Dates
+Format Example: NaN, empty strings
+How to Fix: Use errors='coerce' to handle invalid entries.
+# Example
+data = {'date': ['2023-11-26', None, '', 'invalid-date']}
+df = pd.DataFrame(data)
+df['date'] = pd.to_datetime(df['date'], errors='coerce')
+print(df)
+General Tips
+Use errors='coerce': This ensures invalid dates are converted to NaT instead of causing an error.
+Standardize After Conversion: Once dates are converted, use pandas functionality to ensure uniformity.
+df['date'] = df['date'].dt.strftime('%Y-%m-%d')
+By applying these techniques, you can clean and standardize all datetime structures for seamless analysis.
