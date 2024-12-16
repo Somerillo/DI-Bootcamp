@@ -1,0 +1,84 @@
+<a class="cur-con-weather-card is-desktop lbar-panel content-module" href="/en/us/attica/30607/current-weather/2139413">
+ <div class="title-container">
+  <h2 class="cur-con-weather-card__title">
+   Current Weather
+  </h2>
+  <p class="cur-con-weather-card__subtitle">
+   15:47
+  </p>
+ </div>
+ <div class="cur-con-weather-card__body">
+  <div class="cur-con-weather-card__panel">
+   <div class="forecast-container">
+    <svg class="weather-icon" data-src="/images/weathericons/6.svg" height="88" viewbox="0 0 288 288" width="88">
+     <g fill="none" fill-rule="evenodd" stroke-width="9.778">
+      <path d="M100 49v34.222M46.222 136.658H12M61.916 98.573l-24.2-24.2M128.209 109.427a39.111 39.111 0 1 0-53.778 56.71" stroke="#FF8700">
+      </path>
+      <path d="M276 183.102a56.222 56.222 0 0 0-56.222-56.222h-9.534c-17.963-21.15-46.919-29.36-73.31-20.788-26.391 8.572-44.996 32.23-47.103 59.9H78.05c-20.25 0-36.667 16.415-36.667 36.666 0 20.25 16.416 36.666 36.667 36.666h141.778c31.031-.027 56.173-25.19 56.173-56.222Z" stroke="#BABABA">
+      </path>
+     </g>
+    </svg>
+    <div class="temp-container">
+     <div class="temp">
+      14°
+      <span class="after-temp">
+       C
+      </span>
+     </div>
+     <div class="real-feel">
+      RealFeel®
+						16°
+     </div>
+    </div>
+   </div>
+   <div>
+    <span class="phrase">
+     Mostly cloudy
+    </span>
+    <span class="cur-con-weather-card__cta">
+     <span class="text">
+      More Details
+     </span>
+     <svg class="icon-chevron chevron-icon right" height="6" viewbox="0 0 10 6" width="10" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 .969L9.037 0 5 4.063.963 0 0 .969 5 6z">
+      </path>
+     </svg>
+    </span>
+   </div>
+  </div>
+  <div class="cur-con-weather-card__panel details-container">
+   <div class="spaced-content detail">
+    <span class="label">
+     RealFeel Shade™
+    </span>
+    <span class="value">
+     16°
+    </span>
+   </div>
+   <div class="spaced-content detail">
+    <span class="label">
+     Wind
+    </span>
+    <span class="value">
+     NNW 2 km/h
+    </span>
+   </div>
+   <div class="spaced-content detail">
+    <span class="label">
+     Wind Gusts
+    </span>
+    <span class="value">
+     3 km/h
+    </span>
+   </div>
+   <div class="spaced-content detail">
+    <span class="label">
+     Air Quality
+    </span>
+    <span class="value" style="color: #43D357">
+     Fair
+    </span>
+   </div>
+  </div>
+ </div>
+</a>

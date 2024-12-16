@@ -1,0 +1,17 @@
+
+    <!DOCTYPE html>
+    <html>
+    <body>
+        <h1>Click Counter</h1>
+        <button id="counter-btn">Click me!</button>
+        <p id="counter">Count: 0</p>
+        <script>
+            let count = 0;
+            document.getElementById('counter-btn').onclick = function() {
+                count++;
+                document.getElementById('counter').innerHTML = 'Count: ' + count;
+            };
+        </script>
+    </body>
+    </html>
+    

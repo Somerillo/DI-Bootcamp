@@ -1,0 +1,44 @@
+<!-- 🌟 Exercise 2 : JavaScript Page vs. HTML Page
+Instructions
+
+ompare the behavior of a static HTML page with a JavaScript-enhanced HTML page.
+Instructions
+
+    Create two HTML files – one with only HTML content and another with HTML and JavaScript.
+    In the first file, create a static page with headings, paragraphs, and a list.
+    In the second file, add JavaScript to dynamically modify one of the elements on page load (e.g., change the text of a heading).
+    Open both files in a web browser and observe the differences in behavior and content rendering.
+
+Expected Outcome
+
+The static HTML page should display content as is, whereas the JavaScript-enhanced page should show dynamically altered content, illustrating the interactivity added by JavaScript. -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic JavaScript Page</title>
+</head>
+<body>
+    <h1 id="dynamicHeading">this is the dinamic page</h1>
+    <p>this is a paragraph of content that can be modified</p>
+    <ul id="dynamicList">
+        <li>larry</li>
+        <li>curly</li>
+        <li>moe</li>
+    </ul>
+
+    <script>
+        // Change the text of the heading
+        document.getElementById("dynamicHeading").textContent = "JavaScript Changed This Heading!";
+
+        // Add a new item to the list
+        const list = document.getElementById("dynamicList");
+        const newItem = document.createElement("li");
+        newItem.textContent = "New Item Added by JavaScript";
+        list.appendChild(newItem);
+    </script>
+</body>
+</html>
