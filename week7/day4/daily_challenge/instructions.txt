@@ -1,0 +1,9 @@
+Download the file [here](https://github.com/devtlv/Datasets-DA-Bootcamp-2-/raw/refs/heads/main/Week%207%20-%20Analysing%20Web%20Data/W7D4%20-%20Python%20+%20Excel%20Advanced%20%231/qf-3810.zip).
+
+You should find that the spreadsheet has 3 identical sheets, named Part 1, Part 2 & Part 3. Switch Filtering on for each sheet.
+Now apply filtering as follows:
+
+    On Part 1, filter the table to show dinosaurs that existed in the Cretaceous period, were not carnivores, were less then 2 metres in height and weighed between 10 and 100 kg (this should give 4 dinosaurs).
+    On Part 2, filter the table to show the Jurassic beasts. Then filter further to find the top 50% based upon Length.(this should also give 4 dinosaurs)
+    Lastly, on Part 3, find the bird-hipped dinosaurs that have the word tooth somewhere in the Meaning of Name field (this should only give 2 dinosaurs)
+    When you have finished, save your file as Dino File Filtered and close it down.
