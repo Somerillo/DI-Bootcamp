@@ -7,4 +7,5 @@ config.py
 # Ignorar archivos temporales
 *.tmp
 
+# Ignore compiled Python files
 *.pyc
