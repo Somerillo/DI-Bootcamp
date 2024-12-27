@@ -1,0 +1,536 @@
+[33mcommit 72fa17756659621496d29a4070874681a7d427f2[m
+Author: somerillo <kindadarko@gmail.com>
+Date:   Fri Dec 27 10:17:12 2024 +0200
+
+    A/B test and sentiment analysis using LLM
+
+[1mdiff --git a/week8/day5/mini_project/mini_project1/Mini_project_AB_test_using_real_data.ipynb b/week8/day5/mini_project/mini_project1/Mini_project_AB_test_using_real_data.ipynb[m
+[1mnew file mode 100644[m
+[1mindex 0000000..75ce522[m
+[1m--- /dev/null[m
+[1m+++ b/week8/day5/mini_project/mini_project1/Mini_project_AB_test_using_real_data.ipynb[m
+[36m@@ -0,0 +1,2656 @@[m
+[32m+[m[32m{[m
+[32m+[m[32m  "cells": [[m
+[32m+[m[32m    {[m
+[32m+[m[32m      "cell_type": "markdown",[m
+[32m+[m[32m      "metadata": {[m
+[32m+[m[32m        "id": "nbo-72ZODKz2"[m
+[32m+[m[32m      },[m
+[32m+[m[32m      "source": [[m
+[32m+[m[32m        "# Data Science Analyze and Present A/B Test Results\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "X company recently introduced a new bidding type, “average bidding”, as an alternative to its exisiting bidding\n",[m
+[32m+[m[32m        "type, called “maximum bidding”. One of our clients, X.com, has decided to test this new feature\n",[m
+[32m+[m[32m        "and wants to conduct an A/B test to understand if average bidding brings more conversions than maximum\n",[m
+[32m+[m[32m        "bidding.\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "In this A/B test, X.com randomly splits its audience into two equally sized groups, e.g. the test\n",[m
+[32m+[m[32m        "and the control group. A X company ad campaign with “maximum bidding” is served to “control group” and\n",[m
+[32m+[m[32m        "another campaign with “average bidding” is served to the “test group”.\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "The A/B test has run for 1 month and X.com now expects you to analyze and present the results\n",[m
+[32m+[m[32m        "of this A/B test.\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "##### You should answer the following questions in this notebook\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "1. How would you define the hypothesis of this A/B test?\n",[m
+[32m+[m[32m        "2. Can we conclude statistically significant results?\n",[m
+[32m+[m[32m        "3. Which statistical test did you use, and why?\n",[m
+[32m+[m[32m        "4. Based on your answer to Question 2, what would be your recommendation to client?\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "##### Hints:\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "1. The customer journey for this campaign is:\n",[m
+[32m+[m[32m        "    1. User sees an ad (Impression)\n",[m
+[32m+[m[32m        "    2. User clicks on the website link on the ad (Website Click)\n",[m
+[32m+[m[32m        "    3. User makes a search on the website (Search)\n",[m
+[32m+[m[32m        "    4. User views details of a product (View Content)\n",[m
+[32m+[m[32m        "    5. User adds the product to the cart (Add to Cart)\n",[m
+[32m+[m[32m        "    6. User purchases the product (Purchase)\n",[m
+[32m+[m[32m        "2. Use visualizations to compare test and control group metrics, such as Website Click Through Rate, Cost per Action, and Conversion Rates in addition to Purchase numbers.\n",[m
+[32m+[m[32m        "3. If you see trends, anomalies or other patterns, discuss these in your notebool.\n",[m
+[32m+[m[32m        "4. You can make assumptions if needed.\n"[m
+[32m+[m[32m      ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m      "cell_type": "markdown",[m
+[32m+[m[32m      "metadata": {[m
+[32m+[m[32m        "id": "1nq1PmtlDKz5"[m
+[32m+[m[32m      },[m
+[32m+[m[32m      "source": [[m
+[32m+[m[32m        "## 1. Import libraries"[m
+[32m+[m[32m      ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m      "cell_type": "code",[m
+[32m+[m[32m      "execution_count": 1,[m
+[32m+[m[32m      "metadata": {[m
+[32m+[m[32m        "id": "ZsKzhELSDKz5",[m
+[32m+[m[32m        "trusted": true[m
+[32m+[m[32m      },[m
+[32m+[m[32m      "outputs": [],[m
+[32m+[m[32m      "source": [[m
+[32m+[m[32m        "import pandas as pd\n",[m
+[32m+[m[32m        "import numpy as np\n",[m
+[32m+[m[32m        "import seaborn as sns\n",[m
+[32m+[m[32m        "import matplotlib.pyplot as plt\n",[m
+[32m+[m[32m        "from scipy import stats\n",[m
+[32m+[m[32m        "from scipy.stats import skewtest\n",[m
+[32m+[m[32m        "from scipy.stats import median_test\n",[m
+[32m+[m[32m        "from scipy.stats import shapiro\n",[m
+[32m+[m[32m        "import pylab\n",[m
+[32m+[m[32m        "from sklearn.neighbors import LocalOutlierFactor\n",[m
+[32m+[m[32m        "from scipy.stats import levene\n",[m
+[32m+[m[32m        "from statsmodels.stats.proportion import proportions_ztest\n",[m
+[32m+[m[32m        "from sklearn.impute import KNNImputer\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "pd.set_option(\"display.max_columns\",None);\n",[m
+[32m+[m[32m        "pd.set_option(\"display.max_rows\",None);"[m
+[32m+[m[32m      ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m      "cell_type": "markdown",[m
+[32m+[m[32m      "metadata": {[m
+[32m+[m[32m        "id": "AMaVKs7CDKz6"[m
+[32m+[m[32m      },[m
+[32m+[m[32m      "source": [[m
+[32m+[m[32m        "## 2. Functions"[m
+[32m+[m[32m      ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m      "cell_type": "code",[m
+[32m+[m[32m      "execution_count": 2,[m
+[32m+[m[32m      "metadata": {[m
+[32m+[m[32m        "id": "bwPNKkN3DKz7",[m
+[32m+[m[32m        "trusted": true[m
+[32m+[m[32m      },[m
+[32m+[m[32m      "outputs": [],[m
+[32m+[m[32m      "source": [[m
+[32m+[m[32m        "def read_data() :\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "      Reads and loads control and test group data from an Excel file.\n",[m
+[32m+[m[32m        "    - **Control group** (Maximum Bidding): Existing campaign data.\n",[m
+[32m+[m[32m        "    - **Test group** (Average Bidding): Data from the new bidding strategy.\n",[m
+[32m+[m[32m        "    The function removes rows with NaN values that originated from notes in the Excel file for the control group.\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    #Maximum Bidding(Existing)\n",[m
+[32m+[m[32m        "    control = pd.read_excel(\"../input/ab-test-dataset/AB_Case_Study.xlsx\", sheet_name=\"Control Group\")\n",[m
+[32m+[m[32m        "    #Average Bidding(New)\n",[m
+[32m+[m[32m        "    test = pd.read_excel(\"../input/ab-test-dataset/AB_Case_Study.xlsx\", sheet_name=\"Test Group\")\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "    #In the control dataframe, the rows containing NaN values from the 'note' column (imported from Excel) were removed\n",[m
+[32m+[m[32m        "    control.drop(control.index[[30,31]], inplace = True)\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "    return control, test\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "def get_catvar(df) :\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    Identifies and extracts categorical variables from a DataFrame.\n",[m
+[32m+[m[32m        "    - Returns the original DataFrame, a DataFrame of only categorical variables, and the names of the categorical columns.\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    cat_col = [col for col in df.columns if ( (df[col].dtype == 'object') | (df[col].dtype == 'bool'))]\n",[m
+[32m+[m[32m        "    kat_df = pd.DataFrame(df[cat_col], index = df[cat_col].index)\n",[m
+[32m+[m[32m        "    return df, kat_df, cat_col\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "def get_numvar(cat_col,df):\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    Identifies and extracts numerical variables from a DataFrame, excluding those specified as categorical.\n",[m
+[32m+[m[32m        "    - Returns the original DataFrame, a DataFrame of only numerical variables, and the names of the numerical columns.\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    num_col = [c for c in df.columns if c not in cat_col]\n",[m
+[32m+[m[32m        "    num_df = pd.DataFrame(df[num_col], index = df[num_col].index)\n",[m
+[32m+[m[32m        "    return df, num_df, num_col\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "def fill_NaNValue(num_control) :\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    Implements K-Nearest Neighbors Imputation to fill in missing values in numerical columns of the control group.\n",[m
+[32m+[m[32m        "    - Returns a DataFrame with missing values filled.\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    cols = num_control.columns\n",[m
+[32m+[m[32m        "    imputer = KNNImputer(n_neighbors=8)\n",[m
+[32m+[m[32m        "    num_control = imputer.fit_transform(num_control)\n",[m
+[32m+[m[32m        "    num_control=pd.DataFrame(num_control,columns=cols)\n",[m
+[32m+[m[32m        "    return num_control\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "def convert_datatype(control):\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "      Converts specified columns in the control group DataFrame to integer data types.\n",[m
+[32m+[m[32m        "    - This is important for ensuring data consistency and correctness in calculations.\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    control = control.astype({'# of Impressions' : 'int64',\n",[m
+[32m+[m[32m        "                        'Reach': 'int64',\n",[m
+[32m+[m[32m        "                        '# of Website Clicks' : 'int64',\n",[m
+[32m+[m[32m        "                        '# of Searches': 'int64',\n",[m
+[32m+[m[32m        "                        '# of View Content': 'int64',\n",[m
+[32m+[m[32m        "                        '# of Add to Cart': 'int64',\n",[m
+[32m+[m[32m        "                        '# of Purchase' : 'int64'})\n",[m
+[32m+[m[32m        "    return control\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "def outliers(control, test):\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    Detects and handles outliers in the test group data using Local Outlier Factor (LOF).\n",[m
+[32m+[m[32m        "    - Prints scores of the detected outliers and modifies extreme outlier values based on a specified threshold.\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    clf= LocalOutlierFactor(n_neighbors = 20, contamination = 0.1)\n",[m
+[32m+[m[32m        "    clf.fit_predict(test.iloc[:,2:])[0:10]\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "    test_scores=clf.negative_outlier_factor_\n",[m
+[32m+[m[32m        "    print(\"Test Score: \" , np.sort(test_scores)[0:20])\n",[m
+[32m+[m[32m        "    sns.boxplot(test_scores);\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "    threshold=np.sort(test_scores)[4]\n",[m
+[32m+[m[32m        "    print(\"Threshold score: \", threshold)\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "    test.loc[test_scores < -1.50].index\n",[m
+[32m+[m[32m        "    test.loc[test_scores == threshold]\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "    test.iloc[0,2:]=[2742.245945,79574,57168,3086,1263,1098,226,277]\n",[m
+[32m+[m[32m        "    sns.boxplot(x=\"variable\", y=\"value\", data=pd.melt(test.iloc[:,3:5]));\n",[m
+[32m+[m[32m        "    sns.boxplot(x=\"variable\", y=\"value\", data=pd.melt(test.iloc[:,5:6]));\n",[m
+[32m+[m[32m        "    sns.boxplot(x=\"variable\", y=\"value\", data=pd.melt(test.iloc[:,6:]));\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "def feature_engineering(control, test):\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    Creates new features for both control and test groups to aid in analysis:\n",[m
+[32m+[m[32m        "    - Website Click Through Rate: The percentage of clicks per number of impressions.\n",[m
+[32m+[m[32m        "    - Number of Action: Sum of various engagement metrics like impressions, clicks, etc.\n",[m
+[32m+[m[32m        "    - Cost per Action: The spend divided by the number of actions.\n",[m
+[32m+[m[32m        "    - Conversion Rate: The number of actions divided by the number of clicks, expressed as a percentage.\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    control[\"Website Click Through Rate\"] = control[\"# of Website Clicks\"] / control[\"# of Impressions\"] * 100\n",[m
+[32m+[m[32m        "    test[\"Website Click Through Rate\"] = test[\"# of Website Clicks\"] / test[\"# of Impressions\"] * 100\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "    control[\"Number of Action\"] = control[\"# of Impressions\"] + control[\"# of Website Clicks\"] + control[\"# of Searches\"] + control[\"# of View Content\"] + control[\"# of Add to Cart\"] + control[\"# of Purchase\"]\n",[m
+[32m+[m[32m        "    test[\"Number of Action\"] = test[\"# of Impressions\"] + test[\"# of Website Clicks\"] + test[\"# of Searches\"] + test[\"# of View Content\"] + test[\"# of Add to Cart\"] + test[\"# of Purchase\"]\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "    control[\"Cost per Action\"] = control[\"Spend [USD]\"] / control[\"Number of Action\"]\n",[m
+[32m+[m[32m        "    test[\"Cost per Action\"] = test[\"Spend [USD]\"] / test[\"Number of Action\"]\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "    control[\"Conversion Rate\"] = control[\"Number of Action\"] / control[\"# of Website Clicks\"] * 100\n",[m
+[32m+[m[32m        "    test[\"Conversion Rate\"] = test[\"Number of Action\"] / test[\"# of Website Clicks\"] * 100\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "    return control, test\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "def data_prepare_for_visualization(control,test):\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    Prepares control and test group data for visualization by extracting specific metrics and labeling them for group comparison.\n",[m
+[32m+[m[32m        "    - Returns a consolidated DataFrame of both groups for visualization purposes.\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    control_nop = pd.DataFrame(control[\"# of Purchase\"])\n",[m
+[32m+[m[32m        "    test_nop = pd.DataFrame(test[\"# of Purchase\"])\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "    control_wctr= pd.DataFrame(control[\"Website Click Through Rate\"])\n",[m
+[32m+[m[32m        "    test_wctr= pd.DataFrame(test[\"Website Click Through Rate\"])\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "    control_cpa= pd.DataFrame(control[\"Cost per Action\"])\n",[m
+[32m+[m[32m        "    test_cpa= pd.DataFrame(test[\"Cost per Action\"])\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "    control_cr= pd.DataFrame(control[\"Conversion Rate\"])\n",[m
+[32m+[m[32m        "    test_cr= pd.DataFrame(test[\"Conversion Rate\"])\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "    Group_A = pd.concat([control_nop, control_wctr, control_cpa, control_cr], axis = 1)\n",[m
+[32m+[m[32m        "    Group_A[\"Group\"] = \"A (MaximumBidding)\"\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "    Group_B = pd.concat([test_nop, test_wctr, test_cpa, test_cr], axis = 1)\n",[m
+[32m+[m[32m        "    Group_B[\"Group\"] = \"B (AverageBidding)\"\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "    #Tum veri\n",[m
+[32m+[m[32m        "    AB = pd.concat([Group_A, Group_B])\n",[m
+[32m+[m[32m        "    AB\n",[m
+[32m+[m[32m        "    return AB, control_nop, test_nop\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "def data_prepare_for_hypothesis_testing(control_nop, test_nop):\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    Prepares control and test group data for hypothesis testing by combining \"# of Purchase\" data into a single DataFrame.\n",[m
+[32m+[m[32m        "    - The resulting DataFrame is structured for direct comparison between groups.\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    controlB = pd.concat([control_nop, test_nop], axis = 1)\n",[m
+[32m+[m[32m        "    controlB.columns = [\"A\",\"B\"]\n",[m
+[32m+[m[32m        "    return controlB\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "def num_boxplot(fig, axarr, dimension, cols, hue):\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    A helper function for plotting boxplots of numerical data, categorized by the experiment group.\n",[m
+[32m+[m[32m        "    - It iterates over specified dimensions and columns to generate boxplots for visual analysis.\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    for i in dimension :\n",[m
+[32m+[m[32m        "        for j in dimension :\n",[m
+[32m+[m[32m        "            for c in cols :\n",[m
+[32m+[m[32m        "                sns.boxplot(y=c, x = hue, hue = hue, data = AB, ax=axarr[i][j])\n",[m
+[32m+[m[32m        "                cols.remove(c)\n",[m
+[32m+[m[32m        "                break\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "def show_boxplot(nrows, ncols, boyut, cols, figsize):\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    Generates boxplots for the specified columns and groups, utilizing `num_boxplot`.\n",[m
+[32m+[m[32m        "    - Allows specification of the number of rows and columns in the figure, and figure size.\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    fig, axarr = plt.subplots(nrows, ncols, figsize=figsize)\n",[m
+[32m+[m[32m        "    num_boxplot(fig, axarr, boyut, cols, \"Group\")\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "def checkReject(p_value, alpha = 0.05):\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    Checks whether the p-value from hypothesis testing is significant enough to reject the null hypothesis, given an alpha level (default 0.05).\n",[m
+[32m+[m[32m        "    - Prints the outcome of the hypothesis test in the context of rejecting or not rejecting the null hypothesis.\n",[m
+[32m+[m[32m        "    \"\"\"\n",[m
+[32m+[m[32m        "    if p_value < alpha :\n",[m
+[32m+[m[32m        "        print(f'{p_value} < alpha(0.05) so >>> H0 REJECTED')\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "    elif p_value > alpha :\n",[m
+[32m+[m[32m        "        print(f'{p_value} > alpha(0.05) so >>> H0 CAN\\'T BE REJECTED')"[m
+[32m+[m[32m      ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m      "cell_type": "markdown",[m
+[32m+[m[32m      "metadata": {[m
+[32m+[m[32m        "id": "eTVHnvKUDKz8"[m
+[32m+[m[32m      },[m
+[32m+[m[32m      "source": [[m
+[32m+[m[32m        "## 3. Data Preparation"[m
+[32m+[m[32m      ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m      "cell_type": "code",[m
+[32m+[m[32m      "execution_count": 3,[m
+[32m+[m[32m      "metadata": {[m
+[32m+[m[32m        "id": "gi6ROl-bpgDK"[m
+[32m+[m[32m      },[m
+[32m+[m[32m      "outputs": [],[m
+[32m+[m[32m      "source": [[m
+[32m+[m[32m        "# TODO : Import the dataset available here : https://www.kaggle.com/code/dillonmyrick/a-b-test-hypothesis-testing-for-e-commerce/input"[m
+[32m+[m[32m      ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m      "cell_type": "code",[m
+[32m+[m[32m      "execution_count": 4,[m
+[32m+[m[32m      "metadata": {[m
+[32m+[m[32m        "id": "FKB1Gtm5DKz8",[m
+[32m+[m[32m        "trusted": true[m
+[32m+[m[32m      },[m
+[32m+[m[32m      "outputs": [],[m
+[32m+[m[32m      "source": [[m
+[32m+[m[32m        "# control, test = read_data()\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "path_control = \"control_group.csv\"\n",[m
+[32m+[m[32m        "path_test = \"control_group.csv\"\n",[m
+[32m+[m[32m        "\n",[m
+[32m+[m[32m        "df_control = pd.read_csv(path_control, sep=';')\n",[m
+[32m+[m[32m        "df_test = pd.read_csv(path_test, sep=';')"[m
+[32m+[m[32m      ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m      "cell_type": "code",[m
+[32m+[m[32m      "execution_count": 5,[m
+[32m+[m[32m      "metadata": {[m
+[32m+[m[32m        "colab": {[m
+[32m+[m[32m          "base_uri": "https://localhost:8080/",[m
+[32m+[m[32m          "height": 206[m
+[32m+[m[32m        },[m
+[32m+[m[32m        "id": "A7ip7bmEDKz9",[m
+[32m+[m[32m        "outputId": "3fe1bff5-feb0-4065-c497-b8e47c90cc0b",[m
+[32m+[m[32m        "trusted": true[m
+[32m+[m[32m      },[m
+[32m+[m[32m      "outputs": [[m
+[32m+[m[32m        {[m
+[32m+[m[32m          "data": {[m
+[32m+[m[32m            "text/html": [[m
+[32m+[m[32m              "<div>\n",[m
+[32m+[m[32m              "<style scoped>\n",[m
+[32m+[m[32m              "    .dataframe tbody tr th:only-of-type {\n",[m
+[32m+[m[32m              "        vertical-align: middle;\n",[m
+[32m+[m[32m              "    }\n",[m
+[32m+[m[32m              "\n",[m
+[32m+[m[32m              "    .dataframe tbody tr th {\n",[m
+[32m+[m[32m              "        vertical-align: top;\n",[m
+[32m+[m[32m              "    }\n",[m
+[32m+[m[32m              "\n",[m
+[32m+[m[32m              "    .dataframe thead th {\n",[m
+[32m+[m[32m              "        text-align: right;\n",[m
+[32m+[m[32m              "    }\n",[m
+[32m+[m[32m              "</style>\n",[m
+[32m+[m[32m              "<table border=\"1\" class=\"dataframe\">\n",[m
+[32m+[m[32m              "  <thead>\n",[m
+[32m+[m[32m              "    <tr style=\"text-align: right;\">\n",[m
+[32m+[m[32m              "      <th></th>\n",[m
+[32m+[m[32m              "      <th>Campaign Name</th>\n",[m
+[32m+[m[32m              "      <th>Date</th>\n",[m
+[32m+[m[32m              "      <th>Spend [USD]</th>\n",[m
+[32m+[m[32m              "      <th># of Impressions</th>\n",[m
+[32m+[m[32m              "      <th>Reach</th>\n",[m
+[32m+[m[32m              "      <th># of Website Clicks</th>\n",[m
+[32m+[m[32m              "      <th># of Searches</th>\n",[m
+[32m+[m[32m              "      <th># of View Content</th>\n",[m
+[32m+[m[32m              "      <th># of Add to Cart</th>\n",[m
+[32m+[m[32m              "      <th># of Purchase</th>\n",[m
+[32m+[m[32m              "    </tr>\n",[m
+[32m+[m[32m              "  </thead>\n",[m
+[32m+[m[32m              "  <tbody>\n",[m
+[32m+[m[32m              "    <tr>\n",[m
+[32m+[m[32m              "      <th>0</th>\n",[m
+[32m+[m[32m              "      <td>Control Campaign</td>\n",[m
+[32m+[m[32m              "      <td>1.08.2019</td>\n",[m
+[32m+[m[32m              "      <td>2280</td>\n",[m
+[32m+[m[32m              "      <td>82702.0</td>\n",[m
+[32m+[m[32m              "      <td>56930.0</td>\n",[m
+[32m+[m[32m              "      <td>7016.0</td>\n",[m
+[32m+[m[32m              "      <td>2290.0</td>\n",[m
+[32m+[m[32m              "      <td>2159.0</td>\n",[m
+[32m+[m[32m              "      <td>1819.0</td>\n",[m
+[32m+[m[32m              "      <td>618.0</td>\n",[m
+[32m+[m[32m              "    </tr>\n",[m
+[32m+[m[32m              "    <tr>\n",[m
+[32m+[m[32m              "      <th>1</th>\n",[m
+[32m+[m[32m              "      <td>Control Campaign</td>\n",[m
+[32m+[m[32m              "      <td>2.08.2019</td>\n",[m
+[32m+[m[32m              "      <td>1757</td>\n",[m
+[32m+[m[32m              "      <td>121040.0</td>\n",[m
+[32m+[m[32m              "      <td>102513.0</td>\n",[m
+[32m+[m[32m              "      <td>8110.0</td>\n",[m
+[32m+[m[32m              "      <td>2033.0</td>\n",[m
+[32m+[m[32m              "      <td>1841.0</td>\n",[m
+[32m+[m[32m              "      <td>1219.0</td>\n",[m
+[32m+[m[32m              "      <td>511.0</td>\n",[m
+[32m+[m[32m              "    </tr>\n",[m
+[32m+[m[32m              "    <tr>\n",[m
+[32m+[m[32m              "      <th>2</th>\n",[m
+[32m+[m[32m              "      <td>Control Campaign</td>\n",[m
+[32m+[m[32m              "      <td>3.08.2019</td>\n",[m
+[32m+[m[32m              "      <td>2343</td>\n",[m
+[32m+[m[32m              "      <td>131711.0</td>\n",[m
+[32m+[m[32m              "      <td>110862.0</td>\n",[m
+[32m+[m[32m              "      <td>6508.0</td>\n",[m
+[32m+[m[32m              "      <td>1737.0</td>\n",[m
+[32m+[m[32m              "      <td>1549.0</td>\n",[m
+[32m+[m[32m              "      <td>1134.0</td>\n",[m
+[32m+[m[32m              "      <td>372.0</td>\n",[m
+[32m+[m[32m              "    </tr>\n",[m
+[32m+[m[32m              "    <tr>\n",[m
+[32m+[m[32m              "      <th>3</th>\n",[m
+[32m+[m[32m              "      <td>Control Campaign</td>\n",[m
+[32m+[m[32m              "      <td>4.08.2019</td>\n",[m
+[32m+[m[32m              "      <td>1940</td>\n",[m
+[32m+[m[32m              "      <td>72878.0</td>\n",[m
+[32m+[m[32m              "      <td>61235.0</td>\n",[m
+[32m+[m[32m              "      <td>3065.0</td>\n",[m
+[32m+[m[32m              "      <td>1042.0</td>\n",[m
+[32m+[m[32m              "      <td>982.0</td>\n",[m
+[32m+[m[32m              "      <td>1183.0</td>\n",[m
+[32m+[m[32m              "      <td>340.0</td>\n",[m
+[32m+[m[32m              "    </tr>\n",[m
+[32m+[m[32m              "    <tr>\n",[m
+[32m+[m[32m              "      <th>4</th>\n",[m
+[32m+[m[32m              "      <td>Control Campaign</td>\n",[m
+[32m+[m[32m              "      <td>5.08.2019</td>\n",[m
+[32m+[m[32m              "      <td>1835</td>\n",[m
+[32m+[m[32m              "      <td>NaN</td>\n",[m
+[32m+[m[32m              "      <td>NaN</td>\n",[m
+[32m+[m[32m              "      <td>NaN</td>\n",[m
+[32m+[m[32m              "      <td>NaN</td>\n",[m
+[32m+[m[32m              "      <td>NaN</td>\n",[m
+[32m+[m[32m              "      <td>NaN</td>\n",[m
+[32m+[m[32m              "      <td>NaN</td>\n",[m
+[32m+[m[32m              "    </tr>\n",[m
+[32m+[m[32m              "  </tbody>\n",[m
+[32m+[m[32m              "</table>\n",[m
+[32m+[m[32m              "</div>"[m
+[32m+[m[32m            ],[m
+[32m+[m[32m            "text/plain": [[m
+[32m+[m[32m              "      Campaign Name       Date  Spend [USD]  # of Impressions     Reach  \\\n",[m
+[32m+[m[32m              "0  Control Campaign  1.08.2019         2280           82702.0   56930.0   \n",[m
+[32m+[m[32m              "1  Control Campaign  2.08.2019         1757          121040.0  102513.0   \n",[m
+[32m+[m[32m              "2  Control Campaign  3.08.2019         2343          131711.0  110862.0   \n",[m
+[32m+[m[32m              "3  Control Campaign  4.08.2019         1940           72878.0   61235.0   \n",[m
+[32m+[m[32m              "4  Control Campaign  5.08.2019         1835               NaN       NaN   \n",[m
+[32m+[m[32m              "\n",[m
+[32m+[m[32m              "   # of Website Clicks  # of Searches  # of View Content  # of Add to Cart  \\\n",[m
+[32m+[m[32m              "0               7016.0         2290.0             2159.0            1819.0   \n",[m
+[32m+[m[32m              "1               8110.0         2033.0             1841.0            1219.0   \n",[m
+[32m+[m[32m              "2               6508.0         1737.0             1549.0            1134.0   \n",[m
+[32m+[m[32m              "3               3065.0         1042.0              982.0            1183.0   \n",[m
+[32m+[m[32m              "4                  NaN            NaN                NaN               NaN   \n",[m
+[32m+[m[32m              "\n",[m
+[32m+[m[32m              "   # of Purchase  \n",[m
+[32m+[m[32m              "0          618.0  \n",[m
+[32m+[m[32m              "1          511.0  \n",[m
+[32m+[m[32m              "2          372.0  \n",[m
+[32m+[m[32m              "3          340.0  \n",[m
+[32m+[m[32m              "4            NaN  "[m
+[32m+[m[32m            ][m
+[32m+[m[32m          },[m
+[32m+[m[32m          "execution_count": 5,[m
+[32m+[m[32m          "metadata": {},[m
+[32m+[m[32m          "output_type": "execute_result"[m
+[32m+[m[32m        }[m
+[32m+[m[32m      ],[m
+[32m+[m[32m      "source": [[m
+[32m+[m[32m        "#TODO : print what is control\n",[m
+[32m+[m[32m        "df_control.head()"[m
+[32m+[m[32m      ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m      "cell_type": "code",[m
+[32m+[m[32m      "execution_count": 6,[m
+[32m+[m[32m      "metadata": {[m
+[32m+[m[32m        "colab": {[m
+[32m+[m[32m          "base_uri": "https://localhost:8080/",[m
+[32m+[m[32m          "height": 380[m
+[32m+[m[32m        },[m
+[32m+[m[32m        "id": "i5g2eQGeDKz9",[m
+[32m+[m[32m        "outputId": "d95e3bad-ae80-409d-f41d-29d43331f60a",[m
+[32m+[m[32m        "trusted": true[m
+[32m+[m[32m      },[m
+[32m+[m[32m      "outputs": [[m
+[32m+[m[32m        {[m
+[32m+[m[32m          "data": {[m
+[32m+[m[32m            "text/html": [[m
+[32m+[m[32m              "<div>\n",[m
+[32m+[m[32m              "<style scoped>\n",[m
+[32m+[m[32m              "    .dataframe tbody tr th:only-of-type {\n",[m
+[32m+[m[32m              "        vertical-align: middle;\n",[m
+[32m+[m[32m              "    }\n",[m
+[32m+[m[32m              "\n",[m
+[32m+[m[32m              "    .dataframe tbody tr th {\n",[m
+[32m+[m[32m              "        vertical-align: top;\n",[m
+[32m+[m[32m              "    }\n",[m
+[32m+[m[32m              "\n",[m
+[32m+[m[32m              "    .dataframe thead th {\n",[m
+[32m+[m[32m              "        text-align: right;\n",[m
+[32m+[m[32m              "    }\n",[m
+[32m+[m[32m              "</style>\n",[m
+[32m+[m[32m              "<table border=\"1\" class=\"dataframe\">\n",[m
+[32m+[m[32m              "  <thead>\n",[m
+[32m+[m[32m              "    <tr style=\"text-align: right;\">\n",[m
+[32m+[m[32m              "      <th></th>\n",[m
+[32m+[m[32m              "      <th>Campaign Name</th>\n",[m
+[32m+[m[32m              "      <th>Date</th>\n",[m
+[32m+[m[32m              "      <th>Spend [USD]</th>\n",[m
+[32m+[m[32m              "      <th># of Impressions</th>\n",[m
+[32m+[m[32m              "      <th>Reach</th>\n",[m
+[32m+[m[32m              "      <th># of Website Clicks</th>\n",[m
+[32m+[m[32m              "      <th># of Searches</th>\n",[m
+[32m+[m[32m              "      <th># of View Content</th>\n",[m
+[32m+[m[32m              "      <th># of Add to Cart</th>\n",[m
+[32m+[m[32m              "      <th># of Purchase</th>\n",[m
+[32m+[m[32m              "    </tr>\n",[m
+[32m+[m[32m              "  </thead>\n",[m
+[32m+[m[32m              "  <tbody>\n",[m
+[32m+[m[32m              "    <tr>\n",[m
+[32m+[m[32m              "      <th>0</th>\n",[m
+[32m+[m[32m              "      <td>Control Campaign</td>\n",[m
+[32m+[m[32m              "      <td>1.08.2019</td>\n",[m
+[32m+[m[32m              "      <td>2280</td>\n",[m
+[32m+[m[32m              "      <td>82702.0</td>\n",[m
+[32m+[m[32m              "      <td>56930.0</td>\n",[m
+[32m+[m[32m              "      <td>7016.0</td>\n",[m
+[32m+[m[32m              "      <td>2290.0</td>\n",[m
+[32m+[m[32m              "      <td>2159.0</td>\n",[m
+[32m+[m[32m              "      <td>1819.0</td>\n",[m
+[32m+[m[32m              "      <td>618.0</td>\n",[m
+[32m+[m[32m              "    </tr>\n",[m
+[32m+[m[32m              "    <tr
