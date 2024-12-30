@@ -1,0 +1,27 @@
+Step 1: Load All SQL Files into a Single Database
+You must first execute all your SQL files into a PostgreSQL database. Follow these steps:
+ 1. Create a New Database:
+ - In pgAdmin:
+	- Right-click Databases in the Browser panel.
+	- Select Create > Database.
+	- Enter a name for the database 'combined_db' and click Save.
+ 2. Import Each SQL File:
+ - Open the Query Tool for the new database.
+ - For each '.sql' file:
+	a. Load the file by clicking File > Open File... in the Query Tool.
+	b. Click the Execute/Refresh button (lightning bolt icon) to execute the SQL commands.
+ - Repeat until all SQL files have been loaded into the database.
+
+Step 2: Create a '.backup' or '.tar' File
+Once all SQL files are executed into the database, you can back up the entire database.
+Using pgAdmin:
+ 1. Right-Click on the Database:
+	- In the Browser panel, right-click the database ('combined_db').
+	- Select Backup....
+ 2. Configure Backup Options:
+	- In the Backup Database dialog:
+	- Filename: Click the '...' button and specify a location and name for your backup file like  'combined_db.backup'.
+ 3. Start the Backup:
+	- Click Backup to generate the file.
+	- A '.backup' or '.tar' file will be created in the specified location.
+	- Then with this file, you can go to Restore and select it.
