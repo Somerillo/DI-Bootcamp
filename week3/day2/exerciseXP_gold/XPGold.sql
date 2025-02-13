@@ -104,3 +104,168 @@ Find the sum of all the students grades.
 */
 -- SELECT SUM(math_grade) AS total_grades
 -- FROM students;
+
+-- ##################################################################
+-- ##################################################################
+
+/*
+Exercise 3 : Items and customers
+Instructions
+
+We will work on the public database that we created yesterday.
+
+Part I
+
+Create a table named purchases. It should have 3 columns :
+	id : the primary key of the table
+	customer_id : this column references the table customers
+	item_id : this column references the table items
+	quantity_purchased : this column is the quantity of items purchased by a certain customer
+*/
+-- CREATE TABLE purchases (
+--     id SERIAL PRIMARY KEY, -- Primary key for the table
+--     customer_id INT NOT NULL, -- Foreign key referencing customers table
+--     item_id INT NOT NULL, -- Foreign key referencing items table
+--     quantity_purchased INT NOT NULL CHECK (quantity_purchased > 0), -- Quantity purchased must be positive
+--     CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES customers (customer_id) ON DELETE CASCADE,
+--     CONSTRAINT fk_item FOREIGN KEY (item_id) REFERENCES items (item_id) ON DELETE CASCADE
+-- );
+
+/*
+Insert purchases for the customers, use subqueries:
+
+    Scott Scott bought one fan
+    Melanie Johnson bought ten large desks
+    Greg Jones bougth two small desks
+*/
+-- Insert: Scott Scott bought one fan
+-- INSERT INTO purchases (customer_id, item_id, quantity_purchased)
+-- VALUES (
+--     (SELECT customer_id FROM customers WHERE first_name = 'Scott' AND last_name = 'Scott'),
+--     (SELECT item_id FROM items WHERE item_name = 'Fan'),
+--     1
+-- );
+
+-- melanie is not in the customers!!!
+-- SELECT * FROM customers WHERE first_name = 'Melanie' AND last_name = 'Johnson';
+
+-- -- insert melanie
+-- INSERT INTO customers (customer_id, first_name, last_name)
+-- VALUES (DEFAULT, 'Melanie', 'Johnson');
+
+-- -- Insert: Melanie Johnson bought ten large desks
+-- INSERT INTO purchases (customer_id, item_id, quantity_purchased)
+-- VALUES (
+--     (SELECT customer_id FROM customers WHERE first_name = 'Melanie' AND last_name = 'Johnson'),
+--     (SELECT item_id FROM items WHERE item_name = 'Large Desk'),
+--     10
+-- );
+
+-- -- Insert: Greg Jones bought two small desks
+-- INSERT INTO purchases (customer_id, item_id, quantity_purchased)
+-- VALUES (
+--     (SELECT customer_id FROM customers WHERE first_name = 'Greg' AND last_name = 'Jones'),
+--     (SELECT item_id FROM items WHERE item_name = 'Small Desk'),
+--     2
+-- );
+
+-- SELECT * FROM purchases;
+
+/*
+Part II
+
+Use SQL to get the following from the database:
+
+    All purchases. Is this information useful to us?
+    All purchases, joining with the customers table.
+    Purchases of the customer with the ID equal to 5.
+    Purchases for a large desk AND a small desk
+*/
+-- All purchases. Is this information useful to us?
+-- SELECT * FROM purchases;
+
+-- Is this information useful?
+-- This query returns all rows from the purchases table, 
+-- which includes id, customer_id, item_id, and quantity_purchased. 
+-- While this provides raw data, it lacks context 
+-- (e.g., customer names or item names). To make it more meaningful, 
+-- joining with other tables is recommended.
+
+-- All purchases, joining with the customers table.
+-- SELECT 
+--     p.id AS purchase_id,
+--     c.first_name AS customer_first_name,
+--     c.last_name AS customer_last_name,
+--     p.item_id,
+--     p.quantity_purchased
+-- FROM 
+--     purchases p
+-- JOIN 
+--     customers c ON p.customer_id = c.customer_id;
+
+
+-- -- Purchases of the customer with the ID equal to 5.
+-- SELECT 
+--     p.id AS purchase_id,
+--     c.first_name AS customer_first_name,
+--     c.last_name AS customer_last_name,
+--     i.item_name AS item_name,
+--     p.quantity_purchased
+-- FROM 
+--     purchases p
+-- JOIN 
+--     customers c ON p.customer_id = c.customer_id
+-- JOIN 
+--     items i ON p.item_id = i.item_id
+-- WHERE 
+--     p.customer_id = 5;
+
+-- -- Purchases for a large desk AND a small desk
+-- SELECT 
+--     c.first_name AS customer_first_name,
+--     c.last_name AS customer_last_name,
+--     i.item_name AS item_name,
+--     p.quantity_purchased
+-- FROM 
+--     purchases p
+-- JOIN 
+--     customers c ON p.customer_id = c.customer_id
+-- JOIN 
+--     items i ON p.item_id = i.item_id
+-- WHERE 
+--     i.item_name IN ('Large Desk', 'Small Desk')
+-- GROUP BY 
+--     c.customer_id, i.item_name, c.first_name, c.last_name, p.quantity_purchased
+-- HAVING 
+--     COUNT(DISTINCT i.item_name) = 2;
+
+/*
+Use SQL to show all the customers who have made a purchase. Show the following fields/columns:
+
+    Customer first name
+    Customer last name
+    Item name
+*/
+-- SELECT 
+--     c.first_name AS customer_first_name,
+--     c.last_name AS customer_last_name,
+--     i.item_name AS item_name
+-- FROM 
+--     purchases p
+-- INNER JOIN 
+--     customers c ON p.customer_id = c.customer_id
+-- INNER JOIN 
+--     items i ON p.item_id = i.item_id;
+
+/*
+Add a row which references a customer by ID, but does not 
+reference an item by ID (leave it blank). Does this work? Why/why not?
+*/
+-- INSERT INTO purchases (customer_id, item_id, quantity_purchased)
+-- VALUES (
+--     1, -- Assuming customer with ID 1 exists
+--     NULL, -- No item referenced
+--     3 -- Quantity purchased
+-- );
+-- the item_id column in the purchases table has a NOT NULL constraint 
+-- or if there is a foreign key constraint referencing the items table.
