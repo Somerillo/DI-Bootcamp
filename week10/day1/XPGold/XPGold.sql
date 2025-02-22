@@ -19,7 +19,3 @@ SQL Dataset we will be using
 SELECT table_name 
 FROM information_schema.tables 
 WHERE table_schema = 'olympics';
-
-SELECT DISTINCT gc.id
-FROM games_competitor gc
-JOIN 
