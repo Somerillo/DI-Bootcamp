@@ -88,3 +88,39 @@ across all sports. Use nested subqueries and aggregation.
 -- -- Drop the table after finish
 -- DROP TABLE IF EXISTS three_sport_medalists;
 
+
+
+/*
+🌟 Exercise 3: Cross-Region and Season Analysis
+
+Task 3: Find the regions that have competitors who have won medals in both
+the Summer and Winter games, and calculate the average age of these 
+competitors. Use subqueries and temporary tables to ensure accurate 
+and efficient calculations.
+*/
+-- -- Drop the table if exists
+-- DROP TABLE IF EXISTS dual_season_medalists;
+
+-- -- Create temporary table for medal winners in both seasons
+-- CREATE TEMP TABLE dual_season_medalists AS
+-- SELECT DISTINCT pr.region_id, gc.person_id, gc.age
+-- FROM olympics.person_region pr
+-- JOIN olympics.games_competitor gc ON pr.person_id = gc.person_id
+-- JOIN olympics.competitor_event ce ON gc.id = ce.competitor_id
+-- JOIN olympics.medal m ON ce.medal_id = m.id
+-- JOIN olympics.games g ON gc.games_id = g.id
+-- WHERE g.season IN ('Summer', 'Winter')
+-- GROUP BY pr.region_id, gc.person_id, gc.age
+-- HAVING COUNT(DISTINCT g.season) = 2;
+
+-- -- Calculate average age and select regions
+-- SELECT 
+--     nr.region_name,
+--     AVG(dsm.age) AS avg_age
+-- FROM dual_season_medalists dsm
+-- JOIN olympics.noc_region nr ON dsm.region_id = nr.id
+-- GROUP BY nr.region_name
+-- ORDER BY avg_age DESC;
+
+-- -- Drop the table after finish
+-- DROP TABLE IF EXISTS dual_season_medalists;
