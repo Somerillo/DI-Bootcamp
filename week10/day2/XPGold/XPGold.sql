@@ -18,27 +18,74 @@ Task 2: Create a CTE to calculate the moving average rating of movies over a 5-y
 Task 3: Use the ROW_NUMBER(), RANK(), and DENSE_RANK() functions to create a comprehensive ranking system for movies based on revenue within each genre. Display the genre, movie title, revenue, and their respective row number, rank, and dense rank.
 */
 
-WITH BudgetComparison AS (
+-- WITH BudgetComparison AS (
+--     SELECT 
+--         title,
+--         release_date,
+--         budget,
+--         LAG(budget) OVER (ORDER BY release_date) AS previous_budget,
+--         LEAD(budget) OVER (ORDER BY release_date) AS next_budget
+--     FROM 
+--         movies.movie
+-- )
+-- SELECT 
+--     title,
+--     release_date,
+--     budget,
+--     previous_budget,
+--     next_budget
+-- FROM 
+--     BudgetComparison
+-- WHERE 
+--     budget > previous_budget
+--     AND budget > next_budget
+-- ORDER BY 
+--     release_date;
+
+
+-- Task 2: Create a CTE to calculate the moving average rating
+-- of movies over a 5-year window for each genre. Display the 
+-- genre, movie title, release year, and the moving average rating.
+WITH movie_ratings AS (
     SELECT 
-        title,
-        release_date,
-        budget,
-        LAG(budget) OVER (ORDER BY release_date) AS previous_budget,
-        LEAD(budget) OVER (ORDER BY release_date) AS next_budget
+        mg.genre_id,
+        g.name AS genre_name,
+        m.title,
+        EXTRACT(YEAR FROM m.release_date) AS release_year,
+        m.vote_average AS rating
     FROM 
-        movies.movie
+        movies.movie m
+    JOIN 
+        movies.movie_genres mg ON m.movie_id = mg.movie_id
+    JOIN 
+        movies.genre g ON mg.genre_id = g.genre_id
+    WHERE 
+        m.vote_average IS NOT NULL
+        AND m.release_date IS NOT NULL
+),
+moving_averages AS (
+    SELECT 
+        genre_name,
+        title,
+        release_year,
+        rating,
+        AVG(rating) OVER (
+            PARTITION BY genre_name
+            ORDER BY release_year
+            RANGE BETWEEN 2 PRECEDING AND 2 FOLLOWING
+        ) AS moving_avg_rating
+    FROM 
+        movie_ratings
 )
 SELECT 
+    genre_name,
     title,
-    release_date,
-    budget,
-    previous_budget,
-    next_budget
+    release_year,
+    ROUND(moving_avg_rating, 2) AS moving_avg_rating
 FROM 
-    BudgetComparison
-WHERE 
-    budget > previous_budget
-    AND budget > next_budget
+    moving_averages
 ORDER BY 
-    release_date;
+    genre_name,
+    release_year,
+    title;
 
