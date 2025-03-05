@@ -179,8 +179,44 @@ Task 3: Use a combination of window functions and CTEs to find actors who have a
 --     actor_name;
 
 
--- Task 2: Create a nested subquery to identify genres where the 
--- average movie revenue is above the overall average movie revenue.
--- Within those genres, use a window function to rank movies by their 
--- popularity. Display the genre, movie title, revenue, and rank.
+-- -- Task 2: Create a nested subquery to identify genres where the 
+-- -- average movie revenue is above the overall average movie revenue.
+-- -- Within those genres, use a window function to rank movies by their 
+-- -- popularity. Display the genre, movie title, revenue, and rank.
+-- WITH genre_avg_revenue AS (
+--     SELECT 
+--         g.genre_id,
+--         g.genre_name AS genre_name,
+--         AVG(m.revenue) AS avg_genre_revenue
+--     FROM 
+--         movies.movie m
+--     JOIN 
+--         movies.movie_genres mg ON m.movie_id = mg.movie_id
+--     JOIN 
+--         movies.genre g ON mg.genre_id = g.genre_id
+--     WHERE 
+--         m.revenue IS NOT NULL
+--     GROUP BY 
+--         g.genre_id, g.genre_name
+--     HAVING 
+--         AVG(m.revenue) > (SELECT AVG(revenue) FROM movies.movie WHERE revenue IS NOT NULL)
+-- )
+-- SELECT 
+--     gar.genre_name,
+--     m.title,
+--     m.revenue,
+--     DENSE_RANK() OVER (PARTITION BY gar.genre_id ORDER BY m.popularity DESC) AS popularity_rank
+-- FROM 
+--     movies.movie m
+-- JOIN 
+--     movies.movie_genres mg ON m.movie_id = mg.movie_id
+-- JOIN 
+--     genre_avg_revenue gar ON mg.genre_id = gar.genre_id
+-- WHERE 
+--     m.revenue IS NOT NULL
+-- ORDER BY 
+--     gar.genre_name, 
+--     popularity_rank;
+
+
 
