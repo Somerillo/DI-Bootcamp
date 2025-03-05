@@ -220,3 +220,40 @@ Task 3: Use a combination of window functions and CTEs to find actors who have a
 
 
 
+-- -- Task 3: Use a combination of window functions and CTEs to find actors 
+-- -- who have appeared in movies that have collectively grossed in the top 
+-- -- 10% of all movie revenues. Display the actor’s name and the total 
+-- -- revenue of the movies they have appeared in.
+-- WITH actor_revenues AS (
+--     SELECT 
+--         p.person_id,
+--         p.person_name AS actor_name,
+--         SUM(m.revenue) AS total_revenue
+--     FROM 
+--         movies.person p
+--     JOIN 
+--         movies.movie_cast mc ON p.person_id = mc.person_id
+--     JOIN 
+--         movies.movie m ON mc.movie_id = m.movie_id
+--     WHERE 
+--         m.revenue IS NOT NULL
+--     GROUP BY 
+--         p.person_id, p.person_name
+-- ),
+-- revenue_percentiles AS (
+--     SELECT 
+--         actor_name,
+--         total_revenue,
+--         PERCENT_RANK() OVER (ORDER BY total_revenue DESC) AS revenue_percentile
+--     FROM 
+--         actor_revenues
+-- )
+-- SELECT 
+--     actor_name,
+--     total_revenue
+-- FROM 
+--     revenue_percentiles
+-- WHERE 
+--     revenue_percentile <= 0.1
+-- ORDER BY 
+--     total_revenue DESC;
