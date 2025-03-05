@@ -43,16 +43,65 @@ Task 3: Use the ROW_NUMBER(), RANK(), and DENSE_RANK() functions to create a com
 --     release_date;
 
 
--- Task 2: Create a CTE to calculate the moving average rating
--- of movies over a 5-year window for each genre. Display the 
--- genre, movie title, release year, and the moving average rating.
-WITH movie_ratings AS (
+-- -- Task 2: Create a CTE to calculate the moving average rating
+-- -- of movies over a 5-year window for each genre. Display the 
+-- -- genre, movie title, release year, and the moving average rating.
+-- WITH movie_ratings AS (
+--     SELECT 
+--         mg.genre_id,
+--         g.genre_name AS genre_name,
+--         m.title,
+--         EXTRACT(YEAR FROM m.release_date) AS release_year,
+--         m.vote_average AS rating
+--     FROM 
+--         movies.movie m
+--     JOIN 
+--         movies.movie_genres mg ON m.movie_id = mg.movie_id
+--     JOIN 
+--         movies.genre g ON mg.genre_id = g.genre_id
+--     WHERE 
+--         m.vote_average IS NOT NULL
+--         AND m.release_date IS NOT NULL
+-- ),
+-- moving_averages AS (
+--     SELECT 
+--         genre_name,
+--         title,
+--         release_year,
+--         rating,
+--         AVG(rating) OVER (
+--             PARTITION BY genre_name
+--             ORDER BY release_year
+--             RANGE BETWEEN 2 PRECEDING AND 2 FOLLOWING
+--         ) AS moving_avg_rating
+--     FROM 
+--         movie_ratings
+-- )
+-- SELECT 
+--     genre_name,
+--     title,
+--     release_year,
+--     ROUND(moving_avg_rating, 2) AS moving_avg_rating
+-- FROM 
+--     moving_averages
+-- ORDER BY 
+--     genre_name,
+--     release_year,
+--     title;
+
+
+-- Task 3: Use the ROW_NUMBER(), RANK(), and DENSE_RANK() functions to 
+-- create a comprehensive ranking system for movies based on revenue 
+-- within each genre. Display the genre, movie title, revenue, and their
+-- respective row number, rank, and dense rank.
+WITH movie_rankings AS (
     SELECT 
-        mg.genre_id,
-        g.name AS genre_name,
+        g.genre_name AS genre,
         m.title,
-        EXTRACT(YEAR FROM m.release_date) AS release_year,
-        m.vote_average AS rating
+        m.revenue,
+        ROW_NUMBER() OVER (PARTITION BY g.genre_id ORDER BY m.revenue DESC) AS row_num,
+        RANK() OVER (PARTITION BY g.genre_id ORDER BY m.revenue DESC) AS rank,
+        DENSE_RANK() OVER (PARTITION BY g.genre_id ORDER BY m.revenue DESC) AS dense_rank
     FROM 
         movies.movie m
     JOIN 
@@ -60,32 +109,17 @@ WITH movie_ratings AS (
     JOIN 
         movies.genre g ON mg.genre_id = g.genre_id
     WHERE 
-        m.vote_average IS NOT NULL
-        AND m.release_date IS NOT NULL
-),
-moving_averages AS (
-    SELECT 
-        genre_name,
-        title,
-        release_year,
-        rating,
-        AVG(rating) OVER (
-            PARTITION BY genre_name
-            ORDER BY release_year
-            RANGE BETWEEN 2 PRECEDING AND 2 FOLLOWING
-        ) AS moving_avg_rating
-    FROM 
-        movie_ratings
+        m.revenue IS NOT NULL
 )
 SELECT 
-    genre_name,
+    genre,
     title,
-    release_year,
-    ROUND(moving_avg_rating, 2) AS moving_avg_rating
+    revenue,
+    row_num,
+    rank,
+    dense_rank
 FROM 
-    moving_averages
+    movie_rankings
 ORDER BY 
-    genre_name,
-    release_year,
-    title;
-
+    genre, 
+    revenue DESC;
