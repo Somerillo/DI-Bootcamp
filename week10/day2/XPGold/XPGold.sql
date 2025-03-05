@@ -90,36 +90,36 @@ Task 3: Use the ROW_NUMBER(), RANK(), and DENSE_RANK() functions to create a com
 --     title;
 
 
--- Task 3: Use the ROW_NUMBER(), RANK(), and DENSE_RANK() functions to 
--- create a comprehensive ranking system for movies based on revenue 
--- within each genre. Display the genre, movie title, revenue, and their
--- respective row number, rank, and dense rank.
-WITH movie_rankings AS (
-    SELECT 
-        g.genre_name AS genre,
-        m.title,
-        m.revenue,
-        ROW_NUMBER() OVER (PARTITION BY g.genre_id ORDER BY m.revenue DESC) AS row_num,
-        RANK() OVER (PARTITION BY g.genre_id ORDER BY m.revenue DESC) AS rank,
-        DENSE_RANK() OVER (PARTITION BY g.genre_id ORDER BY m.revenue DESC) AS dense_rank
-    FROM 
-        movies.movie m
-    JOIN 
-        movies.movie_genres mg ON m.movie_id = mg.movie_id
-    JOIN 
-        movies.genre g ON mg.genre_id = g.genre_id
-    WHERE 
-        m.revenue IS NOT NULL
-)
-SELECT 
-    genre,
-    title,
-    revenue,
-    row_num,
-    rank,
-    dense_rank
-FROM 
-    movie_rankings
-ORDER BY 
-    genre, 
-    revenue DESC;
+-- -- Task 3: Use the ROW_NUMBER(), RANK(), and DENSE_RANK() functions to 
+-- -- create a comprehensive ranking system for movies based on revenue 
+-- -- within each genre. Display the genre, movie title, revenue, and their
+-- -- respective row number, rank, and dense rank.
+-- WITH movie_rankings AS (
+--     SELECT 
+--         g.genre_name AS genre,
+--         m.title,
+--         m.revenue,
+--         ROW_NUMBER() OVER (PARTITION BY g.genre_id ORDER BY m.revenue DESC) AS row_num,
+--         RANK() OVER (PARTITION BY g.genre_id ORDER BY m.revenue DESC) AS rank,
+--         DENSE_RANK() OVER (PARTITION BY g.genre_id ORDER BY m.revenue DESC) AS dense_rank
+--     FROM 
+--         movies.movie m
+--     JOIN 
+--         movies.movie_genres mg ON m.movie_id = mg.movie_id
+--     JOIN 
+--         movies.genre g ON mg.genre_id = g.genre_id
+--     WHERE 
+--         m.revenue IS NOT NULL
+-- )
+-- SELECT 
+--     genre,
+--     title,
+--     revenue,
+--     row_num,
+--     rank,
+--     dense_rank
+-- FROM 
+--     movie_rankings
+-- ORDER BY 
+--     genre, 
+--     revenue DESC;
