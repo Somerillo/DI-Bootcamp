@@ -123,3 +123,64 @@ Task 3: Use the ROW_NUMBER(), RANK(), and DENSE_RANK() functions to create a com
 -- ORDER BY 
 --     genre, 
 --     revenue DESC;
+
+
+
+-- #####################################################################################
+/*
+Exercise 2: In-Depth Actor and Genre Analysis
+
+Task 1: Use the FIRST_VALUE() and LAST_VALUE() functions to find the first and last movie each actor appeared in. Display the actor’s name, first movie title, first movie release date, last movie title, and last movie release date.
+Task 2: Create a nested subquery to identify genres where the average movie revenue is above the overall average movie revenue. Within those genres, use a window function to rank movies by their popularity. Display the genre, movie title, revenue, and rank.
+Task 3: Use a combination of window functions and CTEs to find actors who have appeared in movies that have collectively grossed in the top 10% of all movie revenues. Display the actor’s name and the total revenue of the movies they have appeared in.
+*/
+-- WITH actor_movies AS (
+--     SELECT 
+--         p.person_id,
+--         p.person_name AS actor_name,
+--         m.title,
+--         m.release_date,
+--         FIRST_VALUE(m.title) OVER (
+--             PARTITION BY p.person_id 
+--             ORDER BY m.release_date
+--             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+--         ) AS first_movie,
+--         FIRST_VALUE(m.release_date) OVER (
+--             PARTITION BY p.person_id 
+--             ORDER BY m.release_date
+--             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+--         ) AS first_movie_date,
+--         LAST_VALUE(m.title) OVER (
+--             PARTITION BY p.person_id 
+--             ORDER BY m.release_date
+--             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+--         ) AS last_movie,
+--         LAST_VALUE(m.release_date) OVER (
+--             PARTITION BY p.person_id 
+--             ORDER BY m.release_date
+--             ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+--         ) AS last_movie_date
+--     FROM 
+--         movies.person p
+--     JOIN 
+--         movies.movie_cast mc ON p.person_id = mc.person_id
+--     JOIN 
+--         movies.movie m ON mc.movie_id = m.movie_id
+-- )
+-- SELECT DISTINCT -- this is necessary bc we have repeated rows in the CTE
+--     actor_name,
+--     first_movie,
+--     first_movie_date,
+--     last_movie,
+--     last_movie_date
+-- FROM 
+--     actor_movies
+-- ORDER BY 
+--     actor_name;
+
+
+-- Task 2: Create a nested subquery to identify genres where the 
+-- average movie revenue is above the overall average movie revenue.
+-- Within those genres, use a window function to rank movies by their 
+-- popularity. Display the genre, movie title, revenue, and rank.
+
